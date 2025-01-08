@@ -1,12 +1,9 @@
 # Factorio Event Logger
 
-This mod is a fork of [royvandongen
-Factorio-Event-Logger-Mod](https://github.com/royvandongen/Factorio-Event-Logger-Mod) which does not appear to be 
-getting updated. 
+This mod is a fork of [royvandongen Factorio-Event-Logger-Mod](https://github.com/royvandongen/Factorio-Event-Logger-Mod) which does not appear to be getting updated. 
 
 It provides an event logging system for Factorio that generates formatted event logs based on events documented in the  
-[Events API](https://lua-api.factorio.com/latest/events.html), enabling server administrators and players to track 
-game events.
+[Events API](https://lua-api.factorio.com/latest/events.html), enabling server administrators to track game events, and build tooling around it
 
 ## Features
 
@@ -67,8 +64,11 @@ The statistics logging is performed every 10 minutes.
 
 ## Usage
 
-All logs are saved in the standard log output. You can review these logs for detailed insights into player 
-activities, game events, and overall server health.
+All logs are captured in the standard log output. 
+
+Additionally, it is exported as JSON into the file `script-output/game-events.json`. This can be leveraged by your 
+automation and tooling.You can review these logs for detailed insights into player activities, game events, and 
+overall server health.
 
 ## License
 
