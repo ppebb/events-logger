@@ -1,0 +1,17 @@
+<component name="ArtifactManager">
+  <artifact name="events-logger-zip">
+    <output-path>$PROJECT_DIR$/build</output-path>
+    <root id="root">
+      <element id="archive" name="events-logger_0.0.999.zip">
+        <element id="directory" name="events-logger_0.0.999">
+          <element id="file-copy" path="$PROJECT_DIR$/build/files/control.lua" />
+          <element id="file-copy" path="$PROJECT_DIR$/build/files/info.json" />
+          <element id="file-copy" path="$PROJECT_DIR$/build/files/LICENSE.md" />
+          <element id="file-copy" path="$PROJECT_DIR$/build/files/logger.lua" />
+          <element id="file-copy" path="$PROJECT_DIR$/build/files/README.md" />
+          <element id="file-copy" path="$PROJECT_DIR$/build/files/thumbnail.png" />
+        </element>
+      </element>
+    </root>
+  </artifact>
+</component>
