@@ -112,7 +112,9 @@ local function on_rocket_launched(e)
 	log("[ROCKET] " .. "ROCKET LAUNCHED")
 end
 local function checkEvolution(e)
-	log("[EVOLUTION] " .. string.format("%.4f", game.forces["enemy"].evolution_factor))
+	for surface, details in pairs(game.surfaces) do
+		log("[EVOLUTION] " .. string.format("Surface: %s Factor: %.4f", surface, game.forces["enemy"].get_evolution_factor(surface)))
+	end
 end
 local function on_trigger_fired_artillery(e)
 	log("[ARTILLERY] " .. e.entity.name .. (e.source.name or "no source"))

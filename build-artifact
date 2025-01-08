@@ -15,12 +15,14 @@ if [ -f ${ROOT_DIR}/build/packaging.log ]; then
     rm ${ROOT_DIR}/build/packaging.log
 fi
 mkdir -p ${ROOT_DIR}/build
-if [[ ! -f ${ROOT_DIR}/build/factorio-event-logger_${BUILD_VERSION}.zip ]]; then
-    mkdir -p ${ROOT_DIR}/build/factorio-event-logger_${BUILD_VERSION}
-    cp ${ROOT_DIR}/*.lua ${ROOT_DIR}/*.json ${ROOT_DIR}/build/factorio-event-logger_${BUILD_VERSION}/.
+if [[ ! -f ${ROOT_DIR}/build/factorio-events-logger_${BUILD_VERSION}.zip ]]; then
+    ROOT_DIR=$(pwd)
+    mkdir -p ${ROOT_DIR}/build/events-logger_${BUILD_VERSION}
+    cp ${ROOT_DIR}/*.lua ${ROOT_DIR}/*.json ${ROOT_DIR}/*.png ${ROOT_DIR}/build/events-logger_${BUILD_VERSION}/.
     cd ${ROOT_DIR}/build || exit 1
     echo "Creating Build Artifact"
-    7z a ${ROOT_DIR}/build/factorio-event-logger_${BUILD_VERSION}.zip factorio-event-logger_${BUILD_VERSION} 2>&1 > ${ROOT_DIR}/build/packaging.log
+    sed -i "s/@@VERSION@@/${BUILD_VERSION}/g" events-logger_${BUILD_VERSION}/info.json
+    7z a ${ROOT_DIR}/build/events-logger_${BUILD_VERSION}.zip events-logger_${BUILD_VERSION}
     RC=$?
     cd ${ROOT_DIR} || exit 1
     if [[ $RC -ne 0 ]]; then
@@ -29,7 +31,7 @@ if [[ ! -f ${ROOT_DIR}/build/factorio-event-logger_${BUILD_VERSION}.zip ]]; then
         exit $RC
     else
         echo "Build Artifact Created"
-        rm -rf ${ROOT_DIR}/build/factorio-event-logger_${BUILD_VERSION}
+        rm -rf ${ROOT_DIR}/build/events-logger_${BUILD_VERSION}
         exit 0
     fi
 else

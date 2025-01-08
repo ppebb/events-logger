@@ -10,8 +10,6 @@ LimitNOFILE=100000
 ExecStop=/opt/factorio/bin/shutdown.sh $MAINPID
 User=factorio
 Group=factorio
-#Restart=on-failure
-RestartSec=5s
 
 [Install]
 WantedBy=multi-user.target
