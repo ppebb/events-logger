@@ -17,11 +17,11 @@ jobs:
         run: |
           ROOT_DIR=$(pwd)
           mkdir -p ${ROOT_DIR}/build
-          mkdir -p ${ROOT_DIR}/build/event-logger_${{ github.ref_name }}
-          cp ${ROOT_DIR}/*.lua ${ROOT_DIR}/*.json ${ROOT_DIR}/*.png ${ROOT_DIR}/build/event-logger_${{ github.ref_name }}/.
+          mkdir -p ${ROOT_DIR}/build/events-logger_${{ github.ref_name }}
+          cp ${ROOT_DIR}/*.lua ${ROOT_DIR}/*.json ${ROOT_DIR}/*.png ${ROOT_DIR}/build/events-logger_${{ github.ref_name }}/.
           cd ${ROOT_DIR}/build || exit 1
-          sed -i "s/@@VERSION@@/${{ github.ref_name }}/g" event-logger_${{ github.ref_name }}/info.json
-          zip -r ${ROOT_DIR}/build/event-logger_${{ github.ref_name }}.zip event-logger_${{ github.ref_name }}
+          sed -i "s/@@VERSION@@/${{ github.ref_name }}/g" events-logger_${{ github.ref_name }}/info.json
+          zip -r ${ROOT_DIR}/build/events-logger_${{ github.ref_name }}.zip events-logger_${{ github.ref_name }}
       - name: Create Release
         id: create_release
         env:
@@ -55,6 +55,6 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ steps.get_release.outputs.upload_url }} # This pulls from the CREATE RELEASE step above, referencing it's ID to get its outputs object, which include a `upload_url`. See this blog post for more info: https://jasonet.co/posts/new-features-of-github-actions/#passing-data-to-future-steps
-          asset_path: ./build/event-logger_${{ github.ref_name }}.zip
-          asset_name: event-logger_${{ github.ref_name }}.zip
+          asset_path: ./build/events-logger_${{ github.ref_name }}.zip
+          asset_name: events-logger_${{ github.ref_name }}.zip
           asset_content_type: application/zip

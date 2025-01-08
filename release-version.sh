@@ -97,11 +97,11 @@ else
 fi
 
 printf "${LIGHTBLUE}Updating ${PR_BRANCH} from origin${NC}\n"
-git pull origin ${PR_BRANCH} 2> /dev/null
+git pull origin ${PR_BRANCH} --tags 2> /dev/null
 printf "${LIGHTBLUE}Checking out main${NC}\n"
 git checkout main 2> /dev/null
 printf "${LIGHTBLUE}Pulling main from origin${NC}\n"
-git pull origin main 2> /dev/null
+git pull origin main --tags 2> /dev/null
 printf "${LIGHTBLUE}Rebasing ${PR_BRANCH} into main${NC}\n"
 git rebase ${PR_BRANCH} main 2> /dev/null
 
