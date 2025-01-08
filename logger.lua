@@ -15,7 +15,7 @@ local function on_pre_player_died (e)
 		event_json["reason"] = "ambient damage"
 		log("[" .. event_json["event"] .. "] " .. event_json["reason"] .. event_json["name"] .. " - " .. event_json["reason"]) --e.g. poison damage
 	end
-	helpers.write_file("game-events.out", helpers.table_to_json(event_json) .. "\n", true)
+	helpers.write_file("game-events.json", helpers.table_to_json(event_json) .. "\n", true)
 	log("[" .. event_json["event"] .. "] " .. event_json["name"] .. " " .. event_json["reason"])
 end
 
@@ -48,7 +48,7 @@ local function on_player_left_game(e)
 	else
 		event_json["reason"] = "other"
 	end
-	helpers.write_file("game-events.out", helpers.table_to_json(event_json) .. "\n", true)
+	helpers.write_file("game-events.json", helpers.table_to_json(event_json) .. "\n", true)
 	log("[" .. event_json["event"] .. "] " .. event_json["name"] .. " " .. event_json["reason"])
 end
 
@@ -56,7 +56,7 @@ local function on_player_joined_game(e)
 	local event_json = {}
 	event_json["name"] = game.get_player(e.player_index).name
 	event_json["event"] = "JOIN"
-	helpers.write_file("game-events.out", helpers.table_to_json(event_json) .. "\n", true)
+	helpers.write_file("game-events.json", helpers.table_to_json(event_json) .. "\n", true)
 	log("[" .. event_json["event"] .. "] " .. event_json["name"])
 end
 
@@ -70,7 +70,7 @@ local function on_research_started(event)
 	event_json["name"] = get_infinite_research_name(event.research.name)
 	event_json["event"] = "RESEARCH_STARTED"
 	event_json["level"] = (event.research.level or "no-level")
-	helpers.write_file("game-events.out", helpers.table_to_json(event_json) .. "\n", true)
+	helpers.write_file("game-events.json", helpers.table_to_json(event_json) .. "\n", true)
 	log("[" .. event_json["event"] .. "] " .. event_json["name"] .. " " .. event_json["level"])
 end
 
@@ -87,7 +87,7 @@ local function on_research_cancelled(event)
 	event_json["event"] = "RESEARCH_CANCELLED"
 	for k, v in pairs(event.research) do
 		event_json["name"] = get_infinite_research_name(k)
-		helpers.write_file("game-events.out", helpers.table_to_json(event_json) .. "\n", true)
+		helpers.write_file("game-events.json", helpers.table_to_json(event_json) .. "\n", true)
 		log("[" .. event_json["event"] .. "] " .. event_json["name"])
 	end
 end
@@ -99,7 +99,7 @@ local function on_console_chat(e)
 	event_json["event"] = "CHAT"
 	if ( e.player_index ~= nul and e.player_index ~= '' ) then
 		event_json["message"] = e.message
-		helpers.write_file("game-events.out", helpers.table_to_json(event_json) .. "\n", true)
+		helpers.write_file("game-events.json", helpers.table_to_json(event_json) .. "\n", true)
 		log("[" .. event_json["event"] .. "] " .. event_json["name"] .. ": " .. event_json["message"])
 	end
 end
@@ -137,13 +137,13 @@ local function logStats()
 		if (pdat == nil) then
 			-- format of array: {entities placed, ticks played}
 			event_json["stats"]["online_time"] = p.online_time
-			helpers.write_file("game-events.out", helpers.table_to_json(event_json) .. "\n", true)
+			helpers.write_file("game-events.json", helpers.table_to_json(event_json) .. "\n", true)
 			log("[" .. event_json["event"] .. "] " .. event_json["name"] .. " " .. 0 .. " " .. event_json["stats"]["online_time"])
 			storage.playerstats[event_json["name"]] = {0, event_json["stats"]["online_time"]}
 		else
 			if (pdat[1] ~= 0 or (p.online_time - pdat[2]) ~= 0) then
 				event_json["stats"][pdat[1]] = (p.online_time - pdat[2])
-				helpers.write_file("game-events.out", helpers.table_to_json(event_json) .. "\n", true)
+				helpers.write_file("game-events.json", helpers.table_to_json(event_json) .. "\n", true)
 				log("[" .. event_json["event"] .. "] " .. event_json["name"] .. " " .. pdat[1] .. " " .. event_json["stats"][pdat[1]])
 			end
 			-- update the data
@@ -156,7 +156,7 @@ local function on_rocket_launched(e)
 	local event_json = {}
 	event_json["event"] = "ROCKET"
 	event_json["reason"] = "ROCKET_LAUNCHED"
-	helpers.write_file("game-events.out", helpers.table_to_json(event_json) .. "\n", true)
+	helpers.write_file("game-events.json", helpers.table_to_json(event_json) .. "\n", true)
 	log("[" .. event_json["event"] .. "] " .. event_json["reason"])
 end
 local function checkEvolution(e)
@@ -168,7 +168,7 @@ local function checkEvolution(e)
 			["factor"] = game.forces["enemy"].get_evolution_factor(surface),
 			["surface"] = surface
 		}
-		helpers.write_file("game-events.out", helpers.table_to_json(event_json) .. "\n", true)
+		helpers.write_file("game-events.json", helpers.table_to_json(event_json) .. "\n", true)
 		log("[" .. event_json["event"] .. "] " .. string.format("Surface: %s Factor: %.4f", event_json["stats"]["surface"], event_json["stats"]["factor"]))
 	end
 end
@@ -177,7 +177,7 @@ local function on_trigger_fired_artillery(e)
 	event_json["name"] = e.entity.name
 	event_json["event"] = "ARTILLERY"
 	event_json["message"] = (e.source.name or "no source")
-	helpers.write_file("game-events.out", helpers.table_to_json(event_json) .. "\n", true)
+	helpers.write_file("game-events.json", helpers.table_to_json(event_json) .. "\n", true)
 	log("[" .. event_json["event"] .. "] " .. event_json["name"] .. event_json["message"])
 end
 
