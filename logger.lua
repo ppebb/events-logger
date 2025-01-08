@@ -1,46 +1,63 @@
 local function on_pre_player_died (e)
+	local event_json = {}
+	event_json["name"] = game.get_player(e.player_index).name
+	event_json["event"] = "DIED"
+	event_json["reason"] = "no-cause"
 	if e.cause and e.cause.type == "character" then --PvP death
-		log("[DIED] " .. game.get_player(e.player_index).name .. " " .. (game.get_player(e.cause.player.index).name or "no-cause"))
+		event_json["reason"] = "PVP"
+		event_json["cause"] = (game.get_player(e.cause.player.index).name or "no-cause")
+		log("[" .. event_json["event"] .. "] " .. event_json["name"] .. " " .. event_json["reason"])
 	elseif (e.cause) then
-		log("[DIED] " .. game.get_player(e.player_index).name .. " " .. (e.cause.name or "no-cause"))
+		event_json["reason"] = "PVE"
+		event_json["cause"] =  (e.cause.name or "no-cause")
+		log("[" .. event_json["event"] .. "] " .. event_json["reason"] .. ":" .. event_json["name"] .. " " .. event_json["cause"])
 	else
-		log("[DIED] " .. game.get_player(e.player_index).name .. " " .. "no-cause") --e.g. poison damage
+		event_json["reason"] = "ambient damage"
+		log("[" .. event_json["event"] .. "] " .. event_json["reason"] .. event_json["name"] .. " - " .. event_json["reason"]) --e.g. poison damage
 	end
+	helpers.write_file("game-events.out", helpers.table_to_json(event_json) .. "\n", true)
+	log("[" .. event_json["event"] .. "] " .. event_json["name"] .. " " .. event_json["reason"])
 end
 
 local function on_player_left_game(e)
-	local player = game.get_player(e.player_index)
-	local reason
+	local event_json = {}
+	event_json["name"] = game.get_player(e.player_index).name
+	event_json["event"] = "LEAVE"
 	if e.reason == defines.disconnect_reason.quit then
-		reason = "quit"
+		event_json["reason"] = "quit"
 	elseif e.reason == defines.disconnect_reason.dropped then
-		reason = "dropped"
+		event_json["reason"] = "dropped"
 	elseif e.reason == defines.disconnect_reason.reconnect then
-		reason = "reconnect"
+		event_json["reason"] = "reconnect"
 	elseif e.reason == defines.disconnect_reason.wrong_input then
-		reason = "wrong_input"
+		event_json["reason"] = "wrong_input"
 	elseif e.reason == defines.disconnect_reason.desync_limit_reached then
-		reason = "desync_limit_reached"
+		event_json["reason"] = "desync_limit_reached"
 	elseif e.reason == defines.disconnect_reason.cannot_keep_up then
-		reason = "cannot_keep_up"
+		event_json["reason"] = "cannot_keep_up"
 	elseif e.reason == defines.disconnect_reason.afk then
-		reason = "afk"
+		event_json["reason"] = "afk"
 	elseif e.reason == defines.disconnect_reason.kicked then
-		reason = "kicked"
+		event_json["reason"] = "kicked"
 	elseif e.reason == defines.disconnect_reason.kicked_and_deleted then
-		reason = "kicked_and_deleted"
+		event_json["reason"] = "kicked_and_deleted"
 	elseif e.reason == defines.disconnect_reason.banned then
-		reason = "banned"
+		event_json["reason"] = "banned"
 	elseif e.reason == defines.disconnect_reason.switching_servers then
-		reason = "switching_servers"
+		event_json["reason"] = "switching_servers"
 	else
-		reason = "other"
+		event_json["reason"] = "other"
 	end
-        log("[LEAVE] " .. game.get_player(e.player_index).name .. " " .. reason)
+	helpers.write_file("game-events.out", helpers.table_to_json(event_json) .. "\n", true)
+	log("[" .. event_json["event"] .. "] " .. event_json["name"] .. " " .. event_json["reason"])
 end
+
 local function on_player_joined_game(e)
-	local player = game.get_player(e.player_index)
-        log("[JOIN] " .. game.get_player(e.player_index).name)
+	local event_json = {}
+	event_json["name"] = game.get_player(e.player_index).name
+	event_json["event"] = "JOIN"
+	helpers.write_file("game-events.out", helpers.table_to_json(event_json) .. "\n", true)
+	log("[" .. event_json["event"] .. "] " .. event_json["name"])
 end
 
 local function get_infinite_research_name(name)
@@ -49,25 +66,41 @@ local function get_infinite_research_name(name)
 end
 
 local function on_research_started(event)
-	local research_name = get_infinite_research_name(event.research.name)
-        log("[RESEARCH STARTED] " .. research_name .. " " .. (event.research.level or "no-level"))
+	local event_json = {}
+	event_json["name"] = get_infinite_research_name(event.research.name)
+	event_json["event"] = "RESEARCH_STARTED"
+	event_json["level"] = (event.research.level or "no-level")
+	helpers.write_file("game-events.out", helpers.table_to_json(event_json) .. "\n", true)
+	log("[" .. event_json["event"] .. "] " .. event_json["name"] .. " " .. event_json["level"])
 end
 
 local function on_research_finished(event)
-	local research_name = get_infinite_research_name(event.research.name)
-	log("[RESEARCH FINISHED] " .. research_name .. " " .. (event.research.level or "no-level"))
+	local event_json = {}
+	event_json["name"] = get_infinite_research_name(event.research.name)
+	event_json["event"] = "RESEARCH_FINISHED"
+	event_json["level"] = (event.research.level or "no-level")
+	log("[RESEARCH FINISHED] " .. event_json["name"] .. " " .. event_json["level"])
 end
 
 local function on_research_cancelled(event)
+	local event_json = {}
+	event_json["event"] = "RESEARCH_CANCELLED"
 	for k, v in pairs(event.research) do
-        	local research_name = get_infinite_research_name(k)
-        	log("[RESEARCH CANCELLED] " .. research_name)
+		event_json["name"] = get_infinite_research_name(k)
+		helpers.write_file("game-events.out", helpers.table_to_json(event_json) .. "\n", true)
+		log("[" .. event_json["event"] .. "] " .. event_json["name"])
 	end
 end
 
 local function on_console_chat(e)
-        if ( e.player_index ~= nul and e.player_index ~= '' ) then
-		log("[CHAT] " .. game.get_player(e.player_index).name .. ": " .. e.message)
+	local event_json = {}
+	local player = game.get_player(e.player_index)
+	event_json["name"] = player.name
+	event_json["event"] = "CHAT"
+	if ( e.player_index ~= nul and e.player_index ~= '' ) then
+		event_json["message"] = e.message
+		helpers.write_file("game-events.out", helpers.table_to_json(event_json) .. "\n", true)
+		log("[" .. event_json["event"] .. "] " .. event_json["name"] .. ": " .. event_json["message"])
 	end
 end
 
@@ -89,35 +122,63 @@ local function on_init ()
 end
 
 local function logStats()
+	local event_json = {}
+	event_json["event"] = "STATS"
 	-- log built entities and playtime of players
 	for _, p in pairs(game.players)
 	do
-		local pdat = storage.playerstats[p.name]
+		event_json["name"] = p.name
+		event_json["event"] = "STATS"
+		event_json["stats"] = {
+			["online_time"] = p.online_time,
+			[pdat[1]] = (p.online_time - pdat[2])
+		}
+		local pdat = storage.playerstats[event_json["name"]]
 		if (pdat == nil) then
-				-- format of array: {entities placed, ticks played}
-				pdat = {0, p.online_time}
-				log("[STATS] " .. p.name .. " " .. 0 .. " " .. p.online_time)
-				storage.playerstats[p.name] = pdat
+			-- format of array: {entities placed, ticks played}
+			event_json["stats"]["online_time"] = p.online_time
+			helpers.write_file("game-events.out", helpers.table_to_json(event_json) .. "\n", true)
+			log("[" .. event_json["event"] .. "] " .. event_json["name"] .. " " .. 0 .. " " .. event_json["stats"]["online_time"])
+			storage.playerstats[event_json["name"]] = {0, event_json["stats"]["online_time"]}
 		else
 			if (pdat[1] ~= 0 or (p.online_time - pdat[2]) ~= 0) then
-				log("[STATS] " .. p.name .. " " .. pdat[1] .. " " .. (p.online_time - pdat[2]))
+				event_json["stats"][pdat[1]] = (p.online_time - pdat[2])
+				helpers.write_file("game-events.out", helpers.table_to_json(event_json) .. "\n", true)
+				log("[" .. event_json["event"] .. "] " .. event_json["name"] .. " " .. pdat[1] .. " " .. event_json["stats"][pdat[1]])
 			end
 			-- update the data
-			storage.playerstats[p.name] = {0, p.online_time}
+			storage.playerstats[event_json["name"]] = {0, p.online_time}
 		end
 	end
 end
 
 local function on_rocket_launched(e)
-	log("[ROCKET] " .. "ROCKET LAUNCHED")
+	local event_json = {}
+	event_json["event"] = "ROCKET"
+	event_json["reason"] = "ROCKET_LAUNCHED"
+	helpers.write_file("game-events.out", helpers.table_to_json(event_json) .. "\n", true)
+	log("[" .. event_json["event"] .. "] " .. event_json["reason"])
 end
 local function checkEvolution(e)
+	local event_json = {}
+	event_json["name"] = "evolution_factor"
+	event_json["event"] = "EVOLUTION"
 	for surface, details in pairs(game.surfaces) do
-		log("[EVOLUTION] " .. string.format("Surface: %s Factor: %.4f", surface, game.forces["enemy"].get_evolution_factor(surface)))
+		event_json["stats"] = {
+			["factor"] = game.forces["enemy"].get_evolution_factor(surface),
+			["surface"] = surface
+		}
+		helpers.write_file("game-events.out", helpers.table_to_json(event_json) .. "\n", true)
+		log("[" .. event_json["event"] .. "] " .. string.format("Surface: %s Factor: %.4f", event_json["stats"]["surface"], event_json["stats"]["factor"]))
 	end
 end
 local function on_trigger_fired_artillery(e)
-	log("[ARTILLERY] " .. e.entity.name .. (e.source.name or "no source"))
+	local event_json = {}
+	event_json["name"] = e.entity.name
+	event_json["event"] = "ARTILLERY"
+	event_json["message"] = (e.source.name or "no source")
+	helpers.write_file("game-events.out", helpers.table_to_json(event_json) .. "\n", true)
+	log("[" .. event_json["event"] .. "] " .. event_json["name"] .. event_json["message"])
 end
 
 local logging = {}
@@ -125,7 +186,7 @@ logging.events = {
 	[defines.events.on_rocket_launched] = on_rocket_launched,
 	[defines.events.on_research_started] = on_research_started,
 	[defines.events.on_research_finished] = on_research_finished,
-        [defines.events.on_research_cancelled] = on_research_cancelled,
+	[defines.events.on_research_cancelled] = on_research_cancelled,
 	[defines.events.on_player_joined_game] = on_player_joined_game,
 	[defines.events.on_player_left_game] = on_player_left_game,
 	[defines.events.on_pre_player_died] = on_pre_player_died,
