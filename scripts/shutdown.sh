@@ -18,6 +18,7 @@ while [ ${PLAYER_CHECK_COUNT} -lt ${PLAYER_CHECK_MAX} ]; do
     PLAYER_CHECK_COUNT=$((${PLAYER_CHECK_COUNT}+60))
   else
     send_cmd "Server shutting down NOW!"
+    sleep 5
     break
   fi
 done
