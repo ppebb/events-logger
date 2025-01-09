@@ -79,6 +79,7 @@ local function on_research_finished(event)
 	event_json["name"] = get_infinite_research_name(event.research.name)
 	event_json["event"] = "RESEARCH_FINISHED"
 	event_json["level"] = (event.research.level or "no-level")
+	helpers.write_file("game-events.json", helpers.table_to_json(event_json) .. "\n", true)
 	log("[RESEARCH FINISHED] " .. event_json["name"] .. " " .. event_json["level"])
 end
 
