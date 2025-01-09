@@ -1,4 +1,4 @@
-# Factorio Event Logger
+# Factorio Event Logger [![Release Status](https://github.com/Ralnoc/events-logger/actions/workflows/build-release.yml/badge.svg)](https://github.com/Ralnoc/events-logger/actions/workflows/build-release.yml)
 
 This mod is a fork of [royvandongen Factorio-Event-Logger-Mod](https://github.com/royvandongen/Factorio-Event-Logger-Mod) which does not appear to be getting updated. 
 
