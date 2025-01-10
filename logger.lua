@@ -1,63 +1,129 @@
-local function on_pre_player_died (e)
+local function on_pre_player_died(event)
 	local event_json = {}
-	event_json["name"] = game.get_player(e.player_index).name
+	event_json["name"] = game.get_player(event.player_index).name
 	event_json["event"] = "DIED"
 	event_json["reason"] = "no-cause"
-	if e.cause and e.cause.type == "character" then --PvP death
+	if event.cause and event.cause.type == "character" then --PvP death
 		event_json["reason"] = "PVP"
-		event_json["cause"] = (game.get_player(e.cause.player.index).name or "no-cause")
+		event_json["cause"] = (game.get_player(event.cause.player.index).name or "no-cause")
 		log("[" .. event_json["event"] .. "] " .. event_json["name"] .. " " .. event_json["reason"])
-	elseif (e.cause) then
+	elseif (event.cause) then
 		event_json["reason"] = "PVE"
-		event_json["cause"] =  (e.cause.name or "no-cause")
+		event_json["cause"] =  (event.cause.name or "no-cause")
 		log("[" .. event_json["event"] .. "] " .. event_json["reason"] .. ":" .. event_json["name"] .. " " .. event_json["cause"])
 	else
 		event_json["reason"] = "ambient damage"
-		log("[" .. event_json["event"] .. "] " .. event_json["reason"] .. event_json["name"] .. " - " .. event_json["reason"]) --e.g. poison damage
+		log("[" .. event_json["event"] .. "] " .. event_json["reason"] .. event_json["name"] .. " - " .. event_json["reason"]) --event.g. poison damage
 	end
+	event_json["tick"] = event.tick
 	helpers.write_file("game-events.json", helpers.table_to_json(event_json) .. "\n", true)
 	log("[" .. event_json["event"] .. "] " .. event_json["name"] .. " " .. event_json["reason"])
 end
 
-local function on_player_left_game(e)
+local function on_post_entity_died(event)
 	local event_json = {}
-	event_json["name"] = game.get_player(e.player_index).name
+	event_json["name"] = event.entity.name
+	event_json["type"] = event.entity.type
+	event_json["event"] = "DESTROYED"
+	event_json["event_name"] = event.name
+	if event.force then
+		event_json["force"] = {}
+		event_json["force"]["name"] = event.force.name
+		event_json["cause"]["type"] = event.cause.damage_type.name
+	else
+		event_json["force"] = {}
+		event_json["force"]["name"] = "none"
+		event_json["force"]["reason"] = "ambient damage"
+	end
+	if event.cause then
+		event_json["cause"] = {}
+		event_json["cause"]["reason"] = "Combat"
+		event_json["cause"]["name"] =  (event.cause.name or "no-cause")
+		event_json["cause"]["type"] = event.cause.type
+		event_json["cause"]["force"] = event.force.name
+		event_json["cause"]["type"] = event.cause.damage_type.name
+	else
+		event_json["cause"] = {}
+		event_json["cause"]["reason"] = "ambient damage"
+	end
+	event_json["tick"] = event.tick
+	helpers.write_file("game-events.json", helpers.table_to_json(event_json) .. "\n", true)
+	log("[" .. event_json["event"] .. "] " .. "Event Name: " .. event_json["name"] .. " - " .. "Force Reason: " .. event_json["force"]["reason"] .. "Cause Reason: " .. event_json["cause"]["reason"]) --event.g. poison damage
+end
+
+local function on_player_left_game(event)
+	local event_json = {}
+	event_json["name"] = game.get_player(event.player_index).name
 	event_json["event"] = "LEAVE"
-	if e.reason == defines.disconnect_reason.quit then
+	if event.reason == defines.disconnect_reason.quit then
 		event_json["reason"] = "quit"
-	elseif e.reason == defines.disconnect_reason.dropped then
+	elseif event.reason == defines.disconnect_reason.dropped then
 		event_json["reason"] = "dropped"
-	elseif e.reason == defines.disconnect_reason.reconnect then
+	elseif event.reason == defines.disconnect_reason.reconnect then
 		event_json["reason"] = "reconnect"
-	elseif e.reason == defines.disconnect_reason.wrong_input then
+	elseif event.reason == defines.disconnect_reason.wrong_input then
 		event_json["reason"] = "wrong_input"
-	elseif e.reason == defines.disconnect_reason.desync_limit_reached then
+	elseif event.reason == defines.disconnect_reason.desync_limit_reached then
 		event_json["reason"] = "desync_limit_reached"
-	elseif e.reason == defines.disconnect_reason.cannot_keep_up then
+	elseif event.reason == defines.disconnect_reason.cannot_keep_up then
 		event_json["reason"] = "cannot_keep_up"
-	elseif e.reason == defines.disconnect_reason.afk then
+	elseif event.reason == defines.disconnect_reason.afk then
 		event_json["reason"] = "afk"
-	elseif e.reason == defines.disconnect_reason.kicked then
+	elseif event.reason == defines.disconnect_reason.kicked then
 		event_json["reason"] = "kicked"
-	elseif e.reason == defines.disconnect_reason.kicked_and_deleted then
+	elseif event.reason == defines.disconnect_reason.kicked_and_deleted then
 		event_json["reason"] = "kicked_and_deleted"
-	elseif e.reason == defines.disconnect_reason.banned then
+	elseif event.reason == defines.disconnect_reason.banned then
 		event_json["reason"] = "banned"
-	elseif e.reason == defines.disconnect_reason.switching_servers then
+	elseif event.reason == defines.disconnect_reason.switching_servers then
 		event_json["reason"] = "switching_servers"
 	else
 		event_json["reason"] = "other"
 	end
+	event_json["tick"] = event.tick
 	helpers.write_file("game-events.json", helpers.table_to_json(event_json) .. "\n", true)
 	log("[" .. event_json["event"] .. "] " .. event_json["name"] .. " " .. event_json["reason"])
 end
 
-local function on_player_joined_game(e)
+local function on_player_joined_game(event)
 	local event_json = {}
-	event_json["name"] = game.get_player(e.player_index).name
+	event_json["name"] = game.get_player(event.player_index).name
 	event_json["event"] = "JOIN"
+	event_json["tick"] = event.tick
 	helpers.write_file("game-events.json", helpers.table_to_json(event_json) .. "\n", true)
 	log("[" .. event_json["event"] .. "] " .. event_json["name"])
+end
+
+local function on_player_banned(event)
+	local event_json = {}
+	event_json["name"] = event.player_name
+	event_json["event"] = "BANNED"
+	event_json["reason"] = event.reason
+	event_json["admin"] = event.by_player
+	event_json["tick"] = event.tick
+	helpers.write_file("game-events.json", helpers.table_to_json(event_json) .. "\n", true)
+	log("[" .. event_json["event"] .. "] " .. event_json["name"])
+end
+
+local function on_player_unbanned(event)
+	local event_json = {}
+	event_json["name"] = event.player_name
+	event_json["event"] = "BANNED"
+	event_json["reason"] = event.reason
+	event_json["admin"] = event.by_player
+	event_json["tick"] = event.tick
+	helpers.write_file("game-events.json", helpers.table_to_json(event_json) .. "\n", true)
+	log("[" .. event_json["event"] .. "] " .. event_json["name"] .. "by " .. event_json["admin"] .. "for " .. event_json["reason"])
+end
+
+local function on_achievement_gained(event)
+	local event_json = {}
+	event_json["name"] = game.get_player(event.player_index)
+	event_json["event"] = "ACHIEVEMENT_GAINED"
+	event_json["achievement_name"] = event.achievement.name
+	event_json["tick"] = event.tick
+	helpers.write_file("game-events.json", helpers.table_to_json(event_json) .. "\n", true)
+	log("[" .. event_json["event"] .. "] " .. event_json["name"] .. "by " .. event_json["admin"] .. "for " .. event_json["reason"])
 end
 
 local function get_infinite_research_name(name)
@@ -70,6 +136,7 @@ local function on_research_started(event)
 	event_json["name"] = get_infinite_research_name(event.research.name)
 	event_json["event"] = "RESEARCH_STARTED"
 	event_json["level"] = (event.research.level or "no-level")
+	event_json["tick"] = event.tick
 	helpers.write_file("game-events.json", helpers.table_to_json(event_json) .. "\n", true)
 	log("[" .. event_json["event"] .. "] " .. event_json["name"] .. " " .. event_json["level"])
 end
@@ -79,6 +146,7 @@ local function on_research_finished(event)
 	event_json["name"] = get_infinite_research_name(event.research.name)
 	event_json["event"] = "RESEARCH_FINISHED"
 	event_json["level"] = (event.research.level or "no-level")
+	event_json["tick"] = event.tick
 	helpers.write_file("game-events.json", helpers.table_to_json(event_json) .. "\n", true)
 	log("[RESEARCH FINISHED] " .. event_json["name"] .. " " .. event_json["level"])
 end
@@ -86,6 +154,7 @@ end
 local function on_research_cancelled(event)
 	local event_json = {}
 	event_json["event"] = "RESEARCH_CANCELLED"
+	event_json["tick"] = event.tick
 	for k, v in pairs(event.research) do
 		event_json["name"] = get_infinite_research_name(k)
 		helpers.write_file("game-events.json", helpers.table_to_json(event_json) .. "\n", true)
@@ -93,18 +162,19 @@ local function on_research_cancelled(event)
 	end
 end
 
-local function on_console_chat(e)
+local function on_console_chat(event)
 	local event_json = {}
 	event_json["event"] = "CHAT"
-	if ( e.player_index ~= nul and e.player_index ~= '' ) then
-		local player = game.get_player(e.player_index)
+	event_json["tick"] = event.tick
+	if ( event.player_index ~= nul and event.player_index ~= '' ) then
+		local player = game.get_player(event.player_index)
 		event_json["name"] = player.name
-		event_json["message"] = e.message
+		event_json["message"] = event.message
 		helpers.write_file("game-events.json", helpers.table_to_json(event_json) .. "\n", true)
 		log("[" .. event_json["event"] .. "] " .. event_json["name"] .. ": " .. event_json["message"])
 	else
 		event_json["name"] = "Console"
-		event_json["message"] = e.message
+		event_json["message"] = event.message
 		helpers.write_file("game-events.json", helpers.table_to_json(event_json) .. "\n", true)
 		log("[" .. event_json["event"] .. "] " .. event_json["name"] .. ": " .. event_json["message"])
 	end
@@ -121,6 +191,18 @@ local function on_built_entity(event)
 		data[1] = data[1] + 1 --indexes start with 1 in lua
 		storage.playerstats[player.name] = data
 	end
+
+	local event_json = {}
+	event_json["name"] = event.name
+	event_json["tick"] = event.tick
+	event_json["player_name"] = player.name
+	event_json["event"] = "BUILT_ENTITY"
+	if event.entity then
+		event_json["entity"] = {}
+		event_json["entity"]["name"] = event.entity.type
+	end
+	helpers.write_file("game-events.json", helpers.table_to_json(event_json) .. "\n", true)
+	log("[" .. event_json["event"] .. "] " .. event_json["entity"]["name"])
 end
 
 local function on_init ()
@@ -158,14 +240,16 @@ local function logStats()
 	end
 end
 
-local function on_rocket_launched(e)
+local function on_rocket_launched(event)
 	local event_json = {}
 	event_json["event"] = "ROCKET"
 	event_json["reason"] = "ROCKET_LAUNCHED"
+	event_json["tick"] = event.tick
 	helpers.write_file("game-events.json", helpers.table_to_json(event_json) .. "\n", true)
 	log("[" .. event_json["event"] .. "] " .. event_json["reason"])
 end
-local function checkEvolution(e)
+
+local function checkEvolution()
 	local event_json = {}
 	event_json["name"] = "evolution_factor"
 	event_json["event"] = "EVOLUTION"
@@ -178,13 +262,52 @@ local function checkEvolution(e)
 		log("[" .. event_json["event"] .. "] " .. string.format("Surface: %s Factor: %.4f", event_json["stats"]["surface"], event_json["stats"]["factor"]))
 	end
 end
-local function on_trigger_fired_artillery(e)
+
+local function on_trigger_fired_artillery(event)
 	local event_json = {}
-	event_json["name"] = e.entity.name
+	event_json["name"] = event.entity.name
 	event_json["event"] = "ARTILLERY"
-	event_json["message"] = (e.source.name or "no source")
+	event_json["tick"] = event.tick
+	event_json["message"] = (event.source.name or "no source")
 	helpers.write_file("game-events.json", helpers.table_to_json(event_json) .. "\n", true)
 	log("[" .. event_json["event"] .. "] " .. event_json["name"] .. event_json["message"])
+end
+
+local function on_character_corpse_expired(event)
+	local event_json = {}
+	event_json["name"] = event.entity.name
+	event_json["corpse_name"] = event.corpse.name
+	event_json["event"] = "CORPSE_EXPIRED"
+	event_json["tick"] = event.tick
+	helpers.write_file("game-events.json", helpers.table_to_json(event_json) .. "\n", true)
+	log("[" .. event_json["event"] .. "] " .. event_json["name"] .. event_json["corpse_name"])
+end
+
+local function on_picked_up_item(event)
+	local event_json = {}
+	event_json["player_name"] = game.get_player(event.player_index).name
+	event_json["item_name"] = event.item_stack.name
+	event_json["item_count"] = event.item_stack.count
+	event_json["name"] = event.name
+	event_json["event"] = "ITEM_PICKED_UP"
+	event_json["tick"] = event.tick
+	helpers.write_file("game-events.json", helpers.table_to_json(event_json) .. "\n", true)
+	log("[" .. event_json["event"] .. "] " .. event_json["name"] .. event_json["item_name"])
+end
+
+local function on_player_repaired_entity(event)
+	local event_json = {}
+	event_json["player_name"] = game.get_player(event.player_index).name
+	event_json["name"] = event.name
+	event_json["event"] = "ENTITY_REPAIRED"
+	event_json["tick"] = event.tick
+	if event.entity then
+		event_json["entity"] = {}
+		event_json["entity"]["name"] = event.entity.name
+		event_json["entity"]["type"] = event.entity.type
+	end
+	helpers.write_file("game-events.json", helpers.table_to_json(event_json) .. "\n", true)
+	log("[" .. event_json["event"] .. "] " .. event_json["name"] .. event_json["entity"]["name"])
 end
 
 local logging = {}
@@ -199,6 +322,13 @@ logging.events = {
 	[defines.events.on_built_entity] = on_built_entity,
 	[defines.events.on_trigger_fired_artillery] = on_trigger_fired_artillery,
 	[defines.events.on_console_chat] = on_console_chat,
+	[defines.events.on_post_entity_died] = on_post_entity_died,
+	[defines.events.on_player_banned] = on_player_banned,
+	[defines.events.on_player_unbanned] = on_player_unbanned,
+	[defines.events.on_achievement_gained] = on_achievement_gained,
+	[defines.events.on_character_corpse_expired] = on_character_corpse_expired,
+	[defines.events.on_picked_up_item] = on_picked_up_item,
+	[defines.events.on_player_repaired_entity] = on_player_repaired_entity,
 }
 
 logging.on_nth_tick = {

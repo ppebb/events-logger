@@ -24,4 +24,4 @@ for filename in control.lua info.json LICENSE.md logger.lua README.md thumbnail.
   cp ${filename} build/files/.
 done
 printf "${LIGHTBLUE}Updating Version to Test Version${NC}\n"
-sed -i "s/@@VERSION@@/0.0.999/g" build/files/info.json
+sed -i "s/@@VERSION@@/999.999.999/g" build/files/info.json

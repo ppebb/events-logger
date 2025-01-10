@@ -12,15 +12,18 @@ PLAYER_CHECK_MAX=300
 while [ ${PLAYER_CHECK_COUNT} -lt ${PLAYER_CHECK_MAX} ]; do
   PLAYERS=$(cmd_players online | wc -l)
   if [ ${PLAYERS} -ne 0 ]; then
-    send_cmd "Server shutting down in $((${PLAYER_CHECK_MAX} / 60)) minutes!"
+    TIME_LEFT=$((${PLAYER_CHECK_MAX} / 60))
+    send_cmd "[SERVER NOTICE: $(date +"%m-%d-%Y %H:%M:%S")]"
+    send_cmd "Server shutting down in ${TIME_LEFT} minutes!"
     send_cmd "Please log out to avoid the risk of losing progress or being stuck in a bad location!"
-    sleep 60
+    send_cmd "-- End of line --"
     PLAYER_CHECK_COUNT=$((${PLAYER_CHECK_COUNT}+60))
   else
     send_cmd "Server shutting down NOW!"
     sleep 5
     break
   fi
+  sleep 60
 done
 
 if kill -TERM "${PID}" 2> /dev/null; then

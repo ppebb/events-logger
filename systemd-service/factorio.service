@@ -12,6 +12,7 @@ ExecStop=/opt/factorio/bin/shutdown.sh $MAINPID
 PIDFile=/opt/factorio/server.pid
 User=factorio
 Group=factorio
+TimeoutStopSec=330
 
 [Install]
 WantedBy=multi-user.target
