@@ -22,10 +22,44 @@ end
 
 local function on_post_entity_died(event)
 	local event_json = {}
-	event_json["name"] = event.entity.name
-	event_json["type"] = event.entity.type
-	event_json["event"] = "DESTROYED"
+	event_json["name"] = event.name
+	event_json["event"] = "POST_DESTROYED"
 	event_json["event_name"] = event.name
+	event_json["damage_type"] = event.damage_type.name
+	if event.quality then
+		event_json["quality"] = {}
+		event_json["quality"]["name"] = event.quality.name
+		event_json["quality"]["type"] = event.quality.type
+		event_json["quality"]["color"] = event.quality.color
+		event_json["quality"]["level"] = event.quality.level
+	end
+	if event.force then
+		event_json["force"] = {}
+		event_json["force"]["name"] = event.force.name
+		event_json["cause"]["type"] = event.cause.damage_type.name
+	else
+		event_json["force"] = {}
+		event_json["force"]["name"] = "none"
+		event_json["force"]["reason"] = "ambient damage"
+	end
+	event_json["tick"] = event.tick
+	helpers.write_file("game-events.json", helpers.table_to_json(event_json) .. "\n", true)
+	log("[" .. event_json["event"] .. "] " .. "Event Name: " .. event_json["name"] .. " - " .. "Force Reason: " .. event_json["force"]["reason"] .. "Cause Reason: " .. event_json["cause"]["reason"]) --event.g. poison damage
+end
+
+local function on_entity_died(event)
+	local event_json = {}
+	event_json["name"] = event.name
+	event_json["event"] = "DESTROYED"
+	event_json["damage_type"] = event.damage_type.name
+	if event.entity then
+		event_json["entity"] = {}
+		event_json["entity"]["name"] = event.entity.name
+		event_json["entity"]["type"] = event.entity.type
+		event_json["entity"]["force"] = event.entity.force.name
+		event_json["entity"]["position"] = event.entity.position
+		event_json["entity"]["tick"] = event.entity.tick
+	end
 	if event.force then
 		event_json["force"] = {}
 		event_json["force"]["name"] = event.force.name
@@ -41,7 +75,6 @@ local function on_post_entity_died(event)
 		event_json["cause"]["name"] =  (event.cause.name or "no-cause")
 		event_json["cause"]["type"] = event.cause.type
 		event_json["cause"]["force"] = event.force.name
-		event_json["cause"]["type"] = event.cause.damage_type.name
 	else
 		event_json["cause"] = {}
 		event_json["cause"]["reason"] = "ambient damage"
@@ -329,6 +362,7 @@ logging.events = {
 	[defines.events.on_character_corpse_expired] = on_character_corpse_expired,
 	[defines.events.on_picked_up_item] = on_picked_up_item,
 	[defines.events.on_player_repaired_entity] = on_player_repaired_entity,
+	[defines.events.on_entity_died] = on_entity_died,
 }
 
 logging.on_nth_tick = {
