@@ -36,15 +36,13 @@ local function on_post_entity_died(event)
 	if event.force then
 		event_json["force"] = {}
 		event_json["force"]["name"] = event.force.name
-		event_json["cause"]["type"] = event.cause.damage_type.name
 	else
 		event_json["force"] = {}
 		event_json["force"]["name"] = "none"
-		event_json["force"]["reason"] = "ambient damage"
 	end
 	event_json["tick"] = event.tick
 	helpers.write_file("game-events.json", helpers.table_to_json(event_json) .. "\n", true)
-	log("[" .. event_json["event"] .. "] " .. "Event Name: " .. event_json["name"] .. " - " .. "Force Reason: " .. event_json["force"]["reason"] .. "Cause Reason: " .. event_json["cause"]["reason"]) --event.g. poison damage
+	log("[" .. event_json["event"] .. "] " .. "Event Name: " .. event_json["name"] .. " - " .. "Force Name: " .. event_json["force"]["name"]) --event.g. poison damage
 end
 
 local function on_entity_died(event)
@@ -62,7 +60,6 @@ local function on_entity_died(event)
 	if event.force then
 		event_json["force"] = {}
 		event_json["force"]["name"] = event.force.name
-		event_json["cause"]["type"] = event.cause.damage_type.name
 	else
 		event_json["force"] = {}
 		event_json["force"]["name"] = "none"
@@ -80,7 +77,7 @@ local function on_entity_died(event)
 	end
 	event_json["tick"] = event.tick
 	helpers.write_file("game-events.json", helpers.table_to_json(event_json) .. "\n", true)
-	log("[" .. event_json["event"] .. "] " .. "Event Name: " .. event_json["name"] .. " - " .. "Force Reason: " .. event_json["force"]["reason"] .. "Cause Reason: " .. event_json["cause"]["reason"]) --event.g. poison damage
+	log("[" .. event_json["event"] .. "] " .. "Event Name: " .. event_json["name"] .. " - " .. ("Cause Reason: " .. event_json["cause"]["reason"] or "")) --event.g. poison damage
 end
 
 local function on_player_left_game(event)
