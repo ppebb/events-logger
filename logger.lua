@@ -58,7 +58,6 @@ local function on_entity_died(event)
 		event_json["entity"]["type"] = event.entity.type
 		event_json["entity"]["force"] = event.entity.force.name
 		event_json["entity"]["position"] = event.entity.position
-		event_json["entity"]["tick"] = event.entity.tick
 	end
 	if event.force then
 		event_json["force"] = {}
