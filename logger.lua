@@ -114,6 +114,7 @@ local function on_player_left_game(event)
 	log("[" .. event_json["event"] .. "] " .. event_json["name"] .. " " .. event_json["reason"])
 end
 
+
 local function on_player_joined_game(event)
 	local event_json = {}
 	event_json["name"] = game.get_player(event.player_index).name
@@ -122,6 +123,7 @@ local function on_player_joined_game(event)
 	helpers.write_file("game-events.json", helpers.table_to_json(event_json) .. "\n", true)
 	log("[" .. event_json["event"] .. "] " .. event_json["name"])
 end
+
 
 local function on_player_banned(event)
 	local event_json = {}
@@ -134,6 +136,7 @@ local function on_player_banned(event)
 	log("[" .. event_json["event"] .. "] " .. event_json["name"])
 end
 
+
 local function on_player_unbanned(event)
 	local event_json = {}
 	event_json["name"] = event.player_name
@@ -145,6 +148,7 @@ local function on_player_unbanned(event)
 	log("[" .. event_json["event"] .. "] " .. event_json["name"] .. "by " .. event_json["admin"] .. "for " .. event_json["reason"])
 end
 
+
 local function on_achievement_gained(event)
 	local event_json = {}
 	event_json["name"] = game.get_player(event.player_index)
@@ -152,13 +156,15 @@ local function on_achievement_gained(event)
 	event_json["achievement_name"] = event.achievement.name
 	event_json["tick"] = event.tick
 	helpers.write_file("game-events.json", helpers.table_to_json(event_json) .. "\n", true)
-	log("[" .. event_json["event"] .. "] " .. event_json["name"] .. "by " .. event_json["admin"] .. "for " .. event_json["reason"])
+	log("[" .. event_json["event"] .. "] " .. event_json["name"] .. "by " .. event_json["admin"])
 end
+
 
 local function get_infinite_research_name(name)
 	-- gets the name of infinite research (without numbers)
   	return string.match(name, "^(.-)%-%d+$") or name
 end
+
 
 local function on_research_started(event)
 	local event_json = {}
@@ -170,6 +176,7 @@ local function on_research_started(event)
 	log("[" .. event_json["event"] .. "] " .. event_json["name"] .. " " .. event_json["level"])
 end
 
+
 local function on_research_finished(event)
 	local event_json = {}
 	event_json["name"] = get_infinite_research_name(event.research.name)
@@ -179,6 +186,7 @@ local function on_research_finished(event)
 	helpers.write_file("game-events.json", helpers.table_to_json(event_json) .. "\n", true)
 	log("[RESEARCH FINISHED] " .. event_json["name"] .. " " .. event_json["level"])
 end
+
 
 local function on_research_cancelled(event)
 	local event_json = {}
@@ -190,6 +198,7 @@ local function on_research_cancelled(event)
 		log("[" .. event_json["event"] .. "] " .. event_json["name"])
 	end
 end
+
 
 local function on_console_chat(event)
 	local event_json = {}
@@ -208,6 +217,7 @@ local function on_console_chat(event)
 		log("[" .. event_json["event"] .. "] " .. event_json["name"] .. ": " .. event_json["message"])
 	end
 end
+
 
 local function on_built_entity(event)
 	-- get the corresponding data
@@ -234,11 +244,13 @@ local function on_built_entity(event)
 	log("[" .. event_json["event"] .. "] " .. event_json["entity"]["name"])
 end
 
+
 local function on_init ()
 	storage.playerstats = {}
 end
 
-local function logStats()
+
+local function log_stats()
 	local event_json = {}
 	event_json["event"] = "STATS"
 	-- log built entities and playtime of players
@@ -269,6 +281,17 @@ local function logStats()
 	end
 end
 
+
+local function log_tick_over_time()
+	local event_json = {}
+	event_json["event"] = "TICK"
+	event_json["ticks_player"] = game.ticks_players
+	event_json["current_map_Tick"] = game.tick
+	helpers.write_file("game-events.json", helpers.table_to_json(event_json) .. "\n", true)
+	log("[" .. event_json["event"] .. "] " .. event_json["tick"])
+end
+
+
 local function on_rocket_launched(event)
 	local event_json = {}
 	event_json["event"] = "ROCKET"
@@ -277,6 +300,7 @@ local function on_rocket_launched(event)
 	helpers.write_file("game-events.json", helpers.table_to_json(event_json) .. "\n", true)
 	log("[" .. event_json["event"] .. "] " .. event_json["reason"])
 end
+
 
 local function checkEvolution()
 	local event_json = {}
@@ -292,6 +316,7 @@ local function checkEvolution()
 	end
 end
 
+
 local function on_trigger_fired_artillery(event)
 	local event_json = {}
 	event_json["name"] = event.entity.name
@@ -302,6 +327,7 @@ local function on_trigger_fired_artillery(event)
 	log("[" .. event_json["event"] .. "] " .. event_json["name"] .. event_json["message"])
 end
 
+
 local function on_character_corpse_expired(event)
 	local event_json = {}
 	event_json["name"] = event.entity.name
@@ -311,6 +337,7 @@ local function on_character_corpse_expired(event)
 	helpers.write_file("game-events.json", helpers.table_to_json(event_json) .. "\n", true)
 	log("[" .. event_json["event"] .. "] " .. event_json["name"] .. event_json["corpse_name"])
 end
+
 
 local function on_picked_up_item(event)
 	local event_json = {}
@@ -323,6 +350,7 @@ local function on_picked_up_item(event)
 	helpers.write_file("game-events.json", helpers.table_to_json(event_json) .. "\n", true)
 	log("[" .. event_json["event"] .. "] " .. event_json["name"] .. event_json["item_name"])
 end
+
 
 local function on_player_repaired_entity(event)
 	local event_json = {}
@@ -338,6 +366,7 @@ local function on_player_repaired_entity(event)
 	helpers.write_file("game-events.json", helpers.table_to_json(event_json) .. "\n", true)
 	log("[" .. event_json["event"] .. "] " .. event_json["name"] .. event_json["entity"]["name"])
 end
+
 
 local logging = {}
 logging.events = {
@@ -363,9 +392,10 @@ logging.events = {
 
 logging.on_nth_tick = {
 	[60*60*10] = function() -- every 10 minutes
-		logStats()
+		log_stats()
 	end,
 	[60*60*10] = checkEvolution,
+	[60*60] = log_tick_over_time,
 }
 
 logging.on_init = on_init
