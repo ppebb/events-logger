@@ -285,19 +285,13 @@ end
 local function log_tick_over_time()
 	local event_json = {}
 	event_json["event"] = "TICK"
-	event_json["current_map_Tick"] = game.tick
+	event_json["played_ticks"] = game.tick or "no-tick"
+	event_json["tick_paused"] = game.tick_paused or "no-tick"
+	event_json["ticks_to_run"] = game.ticks_to_run or "no-tick"
 	helpers.write_file("game-events.json", helpers.table_to_json(event_json) .. "\n", true)
-	log("[" .. event_json["event"] .. "] " .. event_json["tick"])
-end
-
-
-local function on_rocket_launched(event)
-	local event_json = {}
-	event_json["event"] = "ROCKET"
-	event_json["reason"] = "ROCKET_LAUNCHED"
-	event_json["tick"] = event.tick
-	helpers.write_file("game-events.json", helpers.table_to_json(event_json) .. "\n", true)
-	log("[" .. event_json["event"] .. "] " .. event_json["reason"])
+	log("[" .. event_json["event"] .. "] played_ticks: " .. event_json["played_ticks"])
+	log("[" .. event_json["event"] .. "] tick_paused: " .. event_json["tick_paused"])
+	log("[" .. event_json["event"] .. "] ticks_to_run: " .. event_json["ticks_to_run"])
 end
 
 
@@ -313,6 +307,16 @@ local function checkEvolution()
 		helpers.write_file("game-events.json", helpers.table_to_json(event_json) .. "\n", true)
 		log("[" .. event_json["event"] .. "] " .. string.format("Surface: %s Factor: %.4f", event_json["stats"]["surface"], event_json["stats"]["factor"]))
 	end
+end
+
+
+local function on_rocket_launched(event)
+	local event_json = {}
+	event_json["event"] = "ROCKET"
+	event_json["reason"] = "ROCKET_LAUNCHED"
+	event_json["tick"] = event.tick
+	helpers.write_file("game-events.json", helpers.table_to_json(event_json) .. "\n", true)
+	log("[" .. event_json["event"] .. "] " .. event_json["reason"])
 end
 
 
