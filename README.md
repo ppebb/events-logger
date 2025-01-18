@@ -67,6 +67,11 @@ The statistics logging is performed every 10 minutes.
 
 ## Default Event Logging
 
+### Settings
+The mod provides a settings menu to enable or disable the following event logging formats:
+* `Factorio Logs` - Logs events to the standard `factorio-current.log` file output. Default is enabled.
+* `JSON Logs` - Logs events to the `script-output/game-events.json` file in JSON format. Default is disabled.
+
 ### Usage
 All logs are captured in the standard log output. 
 

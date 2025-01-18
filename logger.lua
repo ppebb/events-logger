@@ -1,3 +1,15 @@
+function write_game_event_json(game_event_json)
+	if settings.global["event-logger-enable-json-logging"].value then
+		helpers.write_file("game-events.json", helpers.table_to_json(game_event_json) .. "\n", true)
+	end
+end
+
+function factorio_log(event_name, message)
+	if settings.global["event-logger-enable-factorio-logging"].value then
+		log("[" .. event_name .. "] " .. message)
+	end
+end
+
 local function on_pre_player_died(event)
 	local event_json = {}
 	event_json["name"] = game.get_player(event.player_index).name
@@ -6,18 +18,18 @@ local function on_pre_player_died(event)
 	if event.cause and event.cause.type == "character" then --PvP death
 		event_json["reason"] = "PVP"
 		event_json["cause"] = (game.get_player(event.cause.player.index).name or "no-cause")
-		log("[" .. event_json["event"] .. "] " .. event_json["name"] .. " " .. event_json["reason"])
+		factorio_log(event_json["event"], event_json["name"] .. " " .. event_json["reason"])
 	elseif (event.cause) then
 		event_json["reason"] = "PVE"
 		event_json["cause"] =  (event.cause.name or "no-cause")
-		log("[" .. event_json["event"] .. "] " .. event_json["reason"] .. ":" .. event_json["name"] .. " " .. event_json["cause"])
+		factorio_log(event_json["event"], event_json["reason"] .. ":" .. event_json["name"] .. " " .. event_json["cause"])
 	else
 		event_json["reason"] = "ambient damage"
-		log("[" .. event_json["event"] .. "] " .. event_json["reason"] .. event_json["name"] .. " - " .. event_json["reason"]) --event.g. poison damage
+		factorio_log(event_json["event"], event_json["reason"] .. event_json["name"] .. " - " .. event_json["reason"]) --event.g. poison damage
 	end
 	event_json["tick"] = event.tick
-	helpers.write_file("game-events.json", helpers.table_to_json(event_json) .. "\n", true)
-	log("[" .. event_json["event"] .. "] " .. event_json["name"] .. " " .. event_json["reason"])
+	write_game_event_json(event_json)
+	factorio_log(event_json["event"], event_json["name"] .. " " .. event_json["reason"])
 end
 
 local function on_post_entity_died(event)
@@ -41,8 +53,8 @@ local function on_post_entity_died(event)
 		event_json["force"]["name"] = "none"
 	end
 	event_json["tick"] = event.tick
-	helpers.write_file("game-events.json", helpers.table_to_json(event_json) .. "\n", true)
-	log("[" .. event_json["event"] .. "] " .. "Event Name: " .. event_json["name"] .. " - " .. "Force Name: " .. event_json["force"]["name"]) --event.g. poison damage
+	write_game_event_json(event_json)
+	factorio_log(event_json["event"], "Event Name: " .. event_json["name"] .. " - " .. "Force Name: " .. event_json["force"]["name"]) --event.g. poison damage
 end
 
 local function on_entity_died(event)
@@ -76,8 +88,8 @@ local function on_entity_died(event)
 		event_json["cause"]["reason"] = "ambient damage"
 	end
 	event_json["tick"] = event.tick
-	helpers.write_file("game-events.json", helpers.table_to_json(event_json) .. "\n", true)
-	log("[" .. event_json["event"] .. "] " .. "Event Name: " .. event_json["name"] .. " - " .. ("Cause Reason: " .. event_json["cause"]["reason"] or "")) --event.g. poison damage
+	write_game_event_json(event_json)
+	factorio_log(event_json["event"], "Event Name: " .. event_json["name"] .. " - " .. ("Cause Reason: " .. event_json["cause"]["reason"] or "")) --event.g. poison damage
 end
 
 local function on_player_left_game(event)
@@ -110,8 +122,8 @@ local function on_player_left_game(event)
 		event_json["reason"] = "other"
 	end
 	event_json["tick"] = event.tick
-	helpers.write_file("game-events.json", helpers.table_to_json(event_json) .. "\n", true)
-	log("[" .. event_json["event"] .. "] " .. event_json["name"] .. " " .. event_json["reason"])
+	write_game_event_json(event_json)
+	factorio_log(event_json["event"], event_json["name"] .. " " .. event_json["reason"])
 end
 
 
@@ -120,8 +132,8 @@ local function on_player_joined_game(event)
 	event_json["name"] = game.get_player(event.player_index).name
 	event_json["event"] = "JOIN"
 	event_json["tick"] = event.tick
-	helpers.write_file("game-events.json", helpers.table_to_json(event_json) .. "\n", true)
-	log("[" .. event_json["event"] .. "] " .. event_json["name"])
+	write_game_event_json(event_json)
+	factorio_log(event_json["event"], event_json["name"])
 end
 
 
@@ -132,8 +144,8 @@ local function on_player_banned(event)
 	event_json["reason"] = event.reason
 	event_json["admin"] = event.by_player
 	event_json["tick"] = event.tick
-	helpers.write_file("game-events.json", helpers.table_to_json(event_json) .. "\n", true)
-	log("[" .. event_json["event"] .. "] " .. event_json["name"])
+	write_game_event_json(event_json)
+	factorio_log(event_json["event"], event_json["name"])
 end
 
 
@@ -144,8 +156,8 @@ local function on_player_unbanned(event)
 	event_json["reason"] = event.reason
 	event_json["admin"] = event.by_player
 	event_json["tick"] = event.tick
-	helpers.write_file("game-events.json", helpers.table_to_json(event_json) .. "\n", true)
-	log("[" .. event_json["event"] .. "] " .. event_json["name"] .. "by " .. event_json["admin"] .. "for " .. event_json["reason"])
+	write_game_event_json(event_json)
+	factorio_log(event_json["event"], event_json["name"] .. "by " .. event_json["admin"] .. "for " .. event_json["reason"])
 end
 
 
@@ -155,8 +167,8 @@ local function on_achievement_gained(event)
 	event_json["event"] = "ACHIEVEMENT_GAINED"
 	event_json["achievement_name"] = event.achievement.name
 	event_json["tick"] = event.tick
-	helpers.write_file("game-events.json", helpers.table_to_json(event_json) .. "\n", true)
-	log("[" .. event_json["event"] .. "] " .. event_json["name"] .. "by " .. event_json["admin"])
+	write_game_event_json(event_json)
+	factorio_log(event_json["event"], event_json["name"] .. "by " .. event_json["admin"])
 end
 
 
@@ -172,8 +184,8 @@ local function on_research_started(event)
 	event_json["event"] = "RESEARCH_STARTED"
 	event_json["level"] = (event.research.level or "no-level")
 	event_json["tick"] = event.tick
-	helpers.write_file("game-events.json", helpers.table_to_json(event_json) .. "\n", true)
-	log("[" .. event_json["event"] .. "] " .. event_json["name"] .. " " .. event_json["level"])
+	write_game_event_json(event_json)
+	factorio_log(event_json["event"], event_json["name"] .. " " .. event_json["level"])
 end
 
 
@@ -183,7 +195,7 @@ local function on_research_finished(event)
 	event_json["event"] = "RESEARCH_FINISHED"
 	event_json["level"] = (event.research.level or "no-level")
 	event_json["tick"] = event.tick
-	helpers.write_file("game-events.json", helpers.table_to_json(event_json) .. "\n", true)
+	write_game_event_json(event_json)
 	log("[RESEARCH FINISHED] " .. event_json["name"] .. " " .. event_json["level"])
 end
 
@@ -192,10 +204,10 @@ local function on_research_cancelled(event)
 	local event_json = {}
 	event_json["event"] = "RESEARCH_CANCELLED"
 	event_json["tick"] = event.tick
-	for k, v in pairs(event.research) do
+	for k, _ in pairs(event.research) do
 		event_json["name"] = get_infinite_research_name(k)
-		helpers.write_file("game-events.json", helpers.table_to_json(event_json) .. "\n", true)
-		log("[" .. event_json["event"] .. "] " .. event_json["name"])
+		write_game_event_json(event_json)
+		factorio_log(event_json["event"], event_json["name"])
 	end
 end
 
@@ -208,13 +220,13 @@ local function on_console_chat(event)
 		local player = game.get_player(event.player_index)
 		event_json["name"] = player.name
 		event_json["message"] = event.message
-		helpers.write_file("game-events.json", helpers.table_to_json(event_json) .. "\n", true)
-		log("[" .. event_json["event"] .. "] " .. event_json["name"] .. ": " .. event_json["message"])
+		write_game_event_json(event_json)
+		factorio_log(event_json["event"], event_json["name"] .. ": " .. event_json["message"])
 	else
 		event_json["name"] = "Console"
 		event_json["message"] = event.message
-		helpers.write_file("game-events.json", helpers.table_to_json(event_json) .. "\n", true)
-		log("[" .. event_json["event"] .. "] " .. event_json["name"] .. ": " .. event_json["message"])
+		write_game_event_json(event_json)
+		factorio_log(event_json["event"], event_json["name"] .. ": " .. event_json["message"])
 	end
 end
 
@@ -240,8 +252,8 @@ local function on_built_entity(event)
 		event_json["entity"] = {}
 		event_json["entity"]["name"] = event.entity.type
 	end
-	helpers.write_file("game-events.json", helpers.table_to_json(event_json) .. "\n", true)
-	log("[" .. event_json["event"] .. "] " .. event_json["entity"]["name"])
+	write_game_event_json(event_json)
+	factorio_log(event_json["event"], event_json["entity"]["name"])
 end
 
 
@@ -266,14 +278,14 @@ local function log_stats()
 		if (pdat == nil) then
 			-- format of array: {entities placed, ticks played}
 			event_json["stats"]["online_time"] = p.online_time
-			helpers.write_file("game-events.json", helpers.table_to_json(event_json) .. "\n", true)
-			log("[" .. event_json["event"] .. "] " .. event_json["name"] .. " " .. 0 .. " " .. event_json["stats"]["online_time"])
+			write_game_event_json(event_json)
+			factorio_log(event_json["event"], event_json["name"] .. " " .. 0 .. " " .. event_json["stats"]["online_time"])
 			storage.playerstats[event_json["name"]] = {0, event_json["stats"]["online_time"]}
 		else
 			if (pdat[1] ~= 0 or (p.online_time - pdat[2]) ~= 0) then
 				event_json["stats"][pdat[1]] = (p.online_time - pdat[2])
-				helpers.write_file("game-events.json", helpers.table_to_json(event_json) .. "\n", true)
-				log("[" .. event_json["event"] .. "] " .. event_json["name"] .. " " .. pdat[1] .. " " .. event_json["stats"][pdat[1]])
+				write_game_event_json(event_json)
+				factorio_log(event_json["event"], event_json["name"] .. " " .. pdat[1] .. " " .. event_json["stats"][pdat[1]])
 			end
 			-- update the data
 			storage.playerstats[event_json["name"]] = {0, p.online_time}
@@ -288,10 +300,10 @@ local function log_tick_over_time()
 	event_json["played_ticks"] = game.tick or "no-tick"
 	event_json["tick_paused"] = game.tick_paused or "no-tick"
 	event_json["ticks_to_run"] = game.ticks_to_run or "no-tick"
-	helpers.write_file("game-events.json", helpers.table_to_json(event_json) .. "\n", true)
-	log("[" .. event_json["event"] .. "] played_ticks: " .. event_json["played_ticks"])
-	log("[" .. event_json["event"] .. "] tick_paused: " .. event_json["tick_paused"])
-	log("[" .. event_json["event"] .. "] ticks_to_run: " .. event_json["ticks_to_run"])
+	write_game_event_json(event_json)
+	factorio_log(event_json["event"],"played_ticks: " .. event_json["played_ticks"])
+	factorio_log(event_json["event"],"tick_paused: " .. event_json["tick_paused"])
+	factorio_log(event_json["event"],"ticks_to_run: " .. event_json["ticks_to_run"])
 end
 
 
@@ -299,13 +311,13 @@ local function checkEvolution()
 	local event_json = {}
 	event_json["name"] = "evolution_factor"
 	event_json["event"] = "EVOLUTION"
-	for surface, details in pairs(game.surfaces) do
+	for surface, _ in pairs(game.surfaces) do
 		event_json["stats"] = {
 			["factor"] = game.forces["enemy"].get_evolution_factor(surface),
 			["surface"] = surface
 		}
-		helpers.write_file("game-events.json", helpers.table_to_json(event_json) .. "\n", true)
-		log("[" .. event_json["event"] .. "] " .. string.format("Surface: %s Factor: %.4f", event_json["stats"]["surface"], event_json["stats"]["factor"]))
+		write_game_event_json(event_json)
+		factorio_log(event_json["event"], string.format("Surface: %s Factor: %.4f", event_json["stats"]["surface"], event_json["stats"]["factor"]))
 	end
 end
 
@@ -315,8 +327,8 @@ local function on_rocket_launched(event)
 	event_json["event"] = "ROCKET"
 	event_json["reason"] = "ROCKET_LAUNCHED"
 	event_json["tick"] = event.tick
-	helpers.write_file("game-events.json", helpers.table_to_json(event_json) .. "\n", true)
-	log("[" .. event_json["event"] .. "] " .. event_json["reason"])
+	write_game_event_json(event_json)
+	factorio_log(event_json["event"], event_json["reason"])
 end
 
 
@@ -326,8 +338,8 @@ local function on_trigger_fired_artillery(event)
 	event_json["event"] = "ARTILLERY"
 	event_json["tick"] = event.tick
 	event_json["message"] = (event.source.name or "no source")
-	helpers.write_file("game-events.json", helpers.table_to_json(event_json) .. "\n", true)
-	log("[" .. event_json["event"] .. "] " .. event_json["name"] .. event_json["message"])
+	write_game_event_json(event_json)
+	factorio_log(event_json["event"], event_json["name"] .. event_json["message"])
 end
 
 
@@ -337,8 +349,8 @@ local function on_character_corpse_expired(event)
 	event_json["corpse_name"] = event.corpse.name
 	event_json["event"] = "CORPSE_EXPIRED"
 	event_json["tick"] = event.tick
-	helpers.write_file("game-events.json", helpers.table_to_json(event_json) .. "\n", true)
-	log("[" .. event_json["event"] .. "] " .. event_json["name"] .. event_json["corpse_name"])
+	write_game_event_json(event_json)
+	factorio_log(event_json["event"], event_json["name"] .. event_json["corpse_name"])
 end
 
 
@@ -350,8 +362,8 @@ local function on_picked_up_item(event)
 	event_json["name"] = event.name
 	event_json["event"] = "ITEM_PICKED_UP"
 	event_json["tick"] = event.tick
-	helpers.write_file("game-events.json", helpers.table_to_json(event_json) .. "\n", true)
-	log("[" .. event_json["event"] .. "] " .. event_json["name"] .. event_json["item_name"])
+	write_game_event_json(event_json)
+	factorio_log(event_json["event"], event_json["name"] .. event_json["item_name"])
 end
 
 
@@ -366,12 +378,15 @@ local function on_player_repaired_entity(event)
 		event_json["entity"]["name"] = event.entity.name
 		event_json["entity"]["type"] = event.entity.type
 	end
-	helpers.write_file("game-events.json", helpers.table_to_json(event_json) .. "\n", true)
-	log("[" .. event_json["event"] .. "] " .. event_json["name"] .. event_json["entity"]["name"])
+	write_game_event_json(event_json)
+	factorio_log(event_json["event"], event_json["name"] .. event_json["entity"]["name"])
 end
 
 
-local logging = {}
+local logging = {
+	write_game_event_json = write_game_event_json,
+	factorio_log = factorio_log,
+}
 logging.events = {
 	[defines.events.on_rocket_launched] = on_rocket_launched,
 	[defines.events.on_research_started] = on_research_started,

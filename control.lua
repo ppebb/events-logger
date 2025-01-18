@@ -1,5 +1,6 @@
 local handler = require("event_handler")
-handler.add_lib(require("logger"))
+local logger = require("logger")
+handler.add_lib(logger)
 require("el_helpers")
 
 ---Function: send_std_log
@@ -19,7 +20,7 @@ remote.add_interface("events-logger", {
             error("Console JSON must have a 'message' key, containing the log message for event. Format: {['message'] = 'MESSAGE'}")
         end
 
-        log("[" .. std_log.event .. "]" .. std_log.message)
+        logger.factorio_log(std_log.event, std_log.message)
     end,
     send_event = function(event_log)
         event_json_keys = keys(event_log)
@@ -31,6 +32,6 @@ remote.add_interface("events-logger", {
             error("Event JSON must have a 'data' key, containing event data in the format: {['key'] = value}")
         end
 
-        helpers.write_file("game-events.json", helpers.table_to_json(event_log) .. "\n", true)
+        logger.write_game_event_json(event_log)
     end
 })
