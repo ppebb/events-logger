@@ -22,10 +22,7 @@ remote.add_interface("events-logger", {
         log("[" .. std_log.event .. "]" .. std_log.message)
     end,
     send_event = function(event_log)
-        --event_json = {}
         event_json_keys = keys(event_log)
-        log("Event JSON: " .. helpers.table_to_json(event_log))
-        log("Event JSON Keys: " .. helpers.table_to_json(event_json_keys))
         if not has_value(event_json_keys, "event") then
             error("Event JSON must have event name in the 'event' key. Format: {['event'] = 'EVENT_NAME'}")
         elseif not has_value(event_json_keys, "tick") and game.tick then
