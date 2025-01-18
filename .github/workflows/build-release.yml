@@ -36,7 +36,7 @@ jobs:
           ROOT_DIR=$(pwd)
           mkdir -p ${ROOT_DIR}/build
           mkdir -p ${ROOT_DIR}/build/events-logger_${{ github.ref_name }}
-          cp -r ${ROOT_DIR}/*.lua ${ROOT_DIR}/*.json ${ROOT_DIR}/*.png changelog.txt README.md LICENSE.md ${ROOT_DIR}/build/events-logger_${{ github.ref_name }}/.
+          cp -r ${ROOT_DIR}/*.lua ${ROOT_DIR}/*.json ${ROOT_DIR}/*.png changelog.txt README.md LICENSE.md locale ${ROOT_DIR}/build/events-logger_${{ github.ref_name }}/.
           cd ${ROOT_DIR}/build || exit 1
           sed -i "s/@@VERSION@@/${{ github.ref_name }}/g" events-logger_${{ github.ref_name }}/info.json
           zip -r ${ROOT_DIR}/build/events-logger_${{ github.ref_name }}.zip events-logger_${{ github.ref_name }}
