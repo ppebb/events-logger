@@ -17,19 +17,19 @@ LIGHTGRAY='\033[0;37m'
 WHITE='\033[1;37m'
 NC='\033[0m'
 
-#printf "${LIGHTBLUE}Copying Factorio Events Logger Mod to Server at ${LIGHTCYAN}dmz-user@192.168.86.62${NC}\n"
-#scp -i ~/Home\ Lab/SSH\ Keys/proxmox-vms.pem ./build/events-logger_999.999.999.zip dmz-user@192.168.86.62:/home/dmz-user/. 2> /dev/null
-printf "${LIGHTBLUE}Removing Factorio Events Logger Mod from Client at ${LIGHTCYAN}/c/Users/drahk/AppData/Roaming/Factorio/mods${NC}\n"
-rm /c/Users/drahk/AppData/Roaming/Factorio/mods/events-logger_*.zip 2> /dev/null
-printf "${LIGHTBLUE}Deploying Factorio Events Logger Mod to Client at ${LIGHTCYAN}/c/Users/drahk/AppData/Roaming/Factorio/mods${NC}\n"
-cp ./build/events-logger_999.999.999.zip /c/Users/drahk/AppData/Roaming/Factorio/mods/. 2> /dev/null
-#printf "${LIGHTBLUE}Removing Factorio Events Logger Mod from ${LIGHTCYAN}/opt/factorio/mods${NC}\n"
-#ssh -i ~/Home\ Lab/SSH\ Keys/proxmox-vms.pem dmz-user@192.168.86.62 "sudo rm /opt/factorio/mods/events-logger_*.zip" 2> /dev/null
-#printf "${LIGHTBLUE}Deploying Factorio Events Logger Mod to ${LIGHTCYAN}/opt/factorio/mods${NC}\n"
-#ssh -i ~/Home\ Lab/SSH\ Keys/proxmox-vms.pem dmz-user@192.168.86.62 "sudo mv /home/dmz-user/events-logger_999.999.999.zip /opt/factorio/mods/." 2> /dev/null
-#printf "${LIGHTBLUE}Setting ownership of Factorio Events Logger Mod to ${GREEN}factorio${NC}\n"
-#ssh -i ~/Home\ Lab/SSH\ Keys/proxmox-vms.pem dmz-user@192.168.86.62 "sudo chown factorio: /opt/factorio/mods/events-logger_999.999.999.zip" 2> /dev/null
-#printf "${LIGHTBLUE}Restarting Factorio Server${NC}\n"
-#ssh -i ~/Home\ Lab/SSH\ Keys/proxmox-vms.pem dmz-user@192.168.86.62 "sudo systemctl stop factorio ; sleep 3 ; sudo systemctl start factorio" 2> /dev/null
-rm -rf ./build
+MOD_NAME="events-logger"
+
+if [ -f ./build/build_number.txt ]; then
+  TESTING_VERSION=$(cat ./build/testing_version.txt)
+else
+  printf "${RED}No testing_version.txt file found${NC}\n"
+  exit 1
+fi
+
+printf "${LIGHTBLUE}Removing ${MOD_NAME} from Client at ${LIGHTCYAN}/c/Users/drahk/AppData/Roaming/Factorio/mods${NC}\n"
+rm /c/Users/drahk/AppData/Roaming/Factorio/mods/${MOD_NAME}*.zip 2> /dev/null
+printf "${LIGHTBLUE}Deploying ${MOD_NAME} (${YELLOW}${TESTING_VERSION}${LIGHTBLUE}) to Client at ${LIGHTCYAN}/c/Users/drahk/AppData/Roaming/Factorio/mods${NC}\n"
+cp ./build/${MOD_NAME}.zip /c/Users/drahk/AppData/Roaming/Factorio/mods/${MOD_NAME}_${TESTING_VERSION}.zip 2> /dev/null
+rm -rf ./build/files
+rm -rf ./build/*.zip
 printf "${LIGHTGREEN}Deployment Complete${NC}\n"

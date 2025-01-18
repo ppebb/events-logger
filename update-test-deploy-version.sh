@@ -17,11 +17,35 @@ LIGHTGRAY='\033[0;37m'
 WHITE='\033[1;37m'
 NC='\033[0m'
 
+MOD_NAME="events-logger"
+ADDITIONAL_FILES="LICENSE.md"
+
 rm -rf ./build/files
 mkdir -p ./build/files
-printf "${LIGHTBLUE}Copying Factorio Events Logger Mod build files to build directory${NC}\n"
-for filename in control.lua info.json LICENSE.md logger.lua README.md thumbnail.png; do
-  cp ${filename} build/files/.
+TEST_VERSION_PREFIX="999.0."
+
+if [ -f ./build/build_number.txt ]; then
+  PREV_BUILD_NUMBER=$(cat ./build/build_number.txt)
+  BUILD_NUMBER=$(( $PREV_BUILD_NUMBER + 1 ))
+  TESTING_VERSION=${TEST_VERSION_PREFIX}${BUILD_NUMBER}
+
+  printf "${LIGHTBLUE}Incrementing Test version from ${YELLOW}${TEST_VERSION_PREFIX}${PREV_BUILD_NUMBER}${LIGHTBLUE} to ${YELLOW}${TESTING_VERSION}${NC}\n"
+  echo $BUILD_NUMBER > ./build/build_number.txt
+  echo $TESTING_VERSION > ./build/testing_version.txt
+else
+  BUILD_NUMBER=0
+  TESTING_VERSION=${TEST_VERSION_PREFIX}${BUILD_NUMBER}
+
+  printf "${LIGHTBLUE}Initializing Test version as ${YELLOW}${TESTING_VERSION}${NC}\n"
+  echo 0 > ./build/build_number.txt
+  echo $TESTING_VERSION > ./build/testing_version.txt
+fi
+
+mkdir -p ./build/files/${MOD_NAME}_${TESTING_VERSION}
+
+printf "${LIGHTBLUE}Copying Factorio Reactive Evolution Factor build files to build directory${NC}\n"
+for filename in *.lua info.json *.png README.md ${ADDITIONAL_FILES}  ; do
+  cp -r ./${filename} ./build/files/${MOD_NAME}_${TESTING_VERSION}/.
 done
 printf "${LIGHTBLUE}Updating Version to Test Version${NC}\n"
-sed -i "s/@@VERSION@@/999.999.999/g" build/files/info.json
+sed -i "s/@@VERSION@@/${TESTING_VERSION}/g" ./build/files/${MOD_NAME}_${TESTING_VERSION}/info.json

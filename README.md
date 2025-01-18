@@ -34,6 +34,9 @@ It provides an event logging system for Factorio that generates formatted event 
 - **Playtime and Statistics**  
   Periodically logs playtime and entity placement statistics for each player.
 
+- **Event API**  
+  Provides an API for other mods to log custom events.
+
 ## Installation
 
 ### Mod Portal Installation
@@ -62,13 +65,60 @@ This mod uses the following event hooks:
 
 The statistics logging is performed every 10 minutes.
 
-## Usage
+## Default Event Logging
 
+### Usage
 All logs are captured in the standard log output. 
 
 Additionally, it is exported as JSON into the file `script-output/game-events.json`. This can be leveraged by your 
 automation and tooling.You can review these logs for detailed insights into player activities, game events, and 
 overall server health.
+
+## Custom Logging
+
+The `send_event` function allows you to log custom events to the `game-events.json` file. This function is part of the 
+remote interface `event-logger` and can be called from other mods or scripts.
+
+### Usage
+
+To use the `send_event` function, you need to call it with a table containing the event details. The table must include 
+the following keys:
+
+- `event`: The name of the event (e.g., `"EVENT_NAME"`).
+- `tick`: The current game tick (e.g., `game.tick`).
+- `data`: A table containing additional event data (e.g., `{["key"] = value}`).
+
+### Example
+
+#### send_event Function
+
+Here is an example of how to call the `send_event` function:
+
+```lua
+remote.call("events-logger", "send_event", {
+    event = "CUSTOM_EVENT",
+    tick = game.tick,
+    data = {
+        key1 = "value1",
+        key2 = "value2"
+    }
+})
+```
+
+#### send_event Function
+
+Here is an example of how to call the `send_event` function:
+
+```lua
+remote.call("events-logger", "send_event", {
+    event = "CUSTOM_EVENT",
+    tick = game.tick,
+    data = {
+        key1 = "value1",
+        key2 = "value2"
+    }
+})
+```
 
 ## License
 
