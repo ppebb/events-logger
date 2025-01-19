@@ -110,19 +110,15 @@ remote.call("events-logger", "send_event", {
 })
 ```
 
-#### send_event Function
+#### send_std_log Function
 
 Here is an example of how to call the `send_event` function:
 
 ```lua
-remote.call("events-logger", "send_event", {
-    event = "CUSTOM_EVENT",
-    tick = game.tick,
-    data = {
-        key1 = "value1",
-        key2 = "value2"
-    }
-})
+remote.call("events-logger", "send_std_log",
+        CUSTOM_EVENT,
+        MESSAGE
+)
 ```
 
 ## License
