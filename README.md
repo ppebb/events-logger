@@ -80,12 +80,10 @@ automation and tooling.You can review these logs for detailed insights into play
 overall server health.
 
 ## Custom Logging
-
 The `send_event` function allows you to log custom events to the `game-events.json` file. This function is part of the 
 remote interface `event-logger` and can be called from other mods or scripts.
 
 ### Usage
-
 To use the `send_event` function, you need to call it with a table containing the event details. The table must include 
 the following keys:
 
@@ -96,7 +94,6 @@ the following keys:
 ### Example
 
 #### send_event Function
-
 Here is an example of how to call the `send_event` function:
 
 ```lua
@@ -111,7 +108,6 @@ remote.call("events-logger", "send_event", {
 ```
 
 #### send_std_log Function
-
 Here is an example of how to call the `send_event` function:
 
 ```lua
@@ -119,6 +115,72 @@ remote.call("events-logger", "send_std_log",
         CUSTOM_EVENT,
         MESSAGE
 )
+```
+
+## Log Cleanup Examples
+The `script-output/game-events.json` file is created and maintained by the `helpers.write_file` function. 
+This function, however, does not perform any log rotation or cleanup. It is recommended to implement a log 
+rotation mechanism to prevent the file from growing indefinitely.
+
+### Linux - logrotate
+If you are running your dedicated server on Linux, you can use the `logrotate` utility to manage log rotation. You need 
+to remember that you have to truncate, not delete the file. It is held open by Factorio server and deleting it will 
+not free up the disk space, and instead make new content inaccessible until the Factorio server is restarted.
+
+Here is an example of a logrotate configuration file for Factorio:
+
+```bash
+/opt/factorio/script-output/game-events.json
+{
+    missingok
+    daily
+    copytruncate
+    rotate 4
+    compress
+    notifempty
+}
+```
+
+### Windows - PowerShell Log-Rotate
+If you are running your dedicated server on Windows, you can use the [Log-Rotate](https://www.powershellgallery.com/packages/Log-Rotate/1.6.1) 
+package to manage log rotation. [Github Repo](https://github.com/theohbrothers/Log-Rotate)
+
+#### Installation
+You can install the `Log-Rotate` module from the PowerShell Gallery using the following command:
+
+```powershell
+Install-Module -Name Log-Rotate -RequiredVersion 1.6.1
+```
+
+Here is an example of a `Log-Rotate` PowerShell script for log rotation:
+
+```powershell
+Import-Module Log-Rotate
+
+# Define your config
+# Double-quotes necessary only if there are spaces in the path
+$config = @'
+"C:\games\factorio\script-output/game-events.json" {
+    missingok
+    daily
+    copytruncate
+    rotate 4
+    compress
+    notifempty
+}
+'@
+
+# Decide on a Log-Rotate state file that will be created by Log-Rotate
+$state = 'C:\var\Log-Rotate\Log-Rotate.status'
+
+# To check rotation logic without rotating files, use the -WhatIf switch (implies -Verbose)
+$config | Log-Rotate -State $state -WhatIf
+
+# You can either Pipe the config
+$config | Log-Rotate -State $state -Verbose
+
+# Or use the full Command
+Log-Rotate -ConfigAsString $config -State $state -Verbose
 ```
 
 ## License
