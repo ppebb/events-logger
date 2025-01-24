@@ -164,7 +164,7 @@ end
 local function on_achievement_gained(event)
 	local event_json = {}
 	event_json["name"] = event.name
-	event_json["player"] = game.get_player(event.player_index)
+	event_json["player"] = game.get_player(event.player_index).name
 	event_json["event"] = "ACHIEVEMENT_GAINED"
 	event_json["achievement_name"] = event.achievement.name
 	event_json["tick"] = event.tick
