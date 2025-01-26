@@ -346,12 +346,14 @@ end
 
 local function on_character_corpse_expired(event)
 	local event_json = {}
-	event_json["name"] = event.entity.name
+	event_json["type"] = event.corpse.type
 	event_json["corpse_name"] = event.corpse.name
+	event_json["position_x"] = event.corpse.position.x
+	event_json["position_y"] = event.corpse.position.y
 	event_json["event"] = "CORPSE_EXPIRED"
 	event_json["tick"] = event.tick
 	write_game_event_json(event_json)
-	factorio_log(event_json["event"], event_json["name"] .. event_json["corpse_name"])
+	factorio_log(event_json["event"], event_json["type"] .. event_json["corpse_name"])
 end
 
 
