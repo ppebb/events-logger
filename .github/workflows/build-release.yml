@@ -34,7 +34,8 @@ jobs:
       - name: Build project
         run: |
           ROOT_DIR=$(pwd)
-          ./build-artifact-files.sh
+          chmod +x ${ROOT_DIR}/build-artifact-files.sh
+          ${ROOT_DIR}/build-artifact-files.sh
           mv ${ROOT_DIR}/build/files/events-logger ${ROOT_DIR}/build/events-logger_${{ github.ref_name }}
           cd ${ROOT_DIR}/build || exit 1
           sed -i "s/@@VERSION@@/${{ github.ref_name }}/g" events-logger_${{ github.ref_name }}/info.json
