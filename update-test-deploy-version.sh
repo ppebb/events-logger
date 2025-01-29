@@ -18,7 +18,7 @@ WHITE='\033[1;37m'
 NC='\033[0m'
 
 MOD_NAME="events-logger"
-ADDITIONAL_FILES="LICENSE.md locale"
+ADDITIONAL_FILES="LICENSE.md locale events custom_events"
 
 rm -rf ./build/files
 mkdir -p ./build/files
