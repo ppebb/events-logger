@@ -6,7 +6,7 @@ function on_post_entity_died(event)
     if event.damage_type then
         event_json["damage_type"] = event.damage_type.name
     else
-        event_json["damage_type"] = {}
+        event_json["damage_type"] = "no-damage"
     end
     if event.quality then
         event_json["quality"] = {}
@@ -32,9 +32,9 @@ function on_entity_died(event)
     event_json["name"] = event.name
     event_json["event"] = "DESTROYED"
     if event.damage_type then
-        event_json["damage_type"] = event.damage_type.name or "no-damage"
+        event_json["damage_type"] = event.damage_type.name
     else
-        event_json["damage_type"] = {}
+        event_json["damage_type"] = "no-damage"
     end
     if event.entity then
         event_json["entity"] = {}
