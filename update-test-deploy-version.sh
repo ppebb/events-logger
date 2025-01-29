@@ -18,10 +18,7 @@ WHITE='\033[1;37m'
 NC='\033[0m'
 
 MOD_NAME="events-logger"
-ADDITIONAL_FILES="LICENSE.md locale events custom_events"
 
-rm -rf ./build/files
-mkdir -p ./build/files
 TEST_VERSION_PREFIX="999.0."
 
 if [ -f ./build/build_number.txt ]; then
@@ -41,11 +38,8 @@ else
   echo $TESTING_VERSION > ./build/testing_version.txt
 fi
 
-mkdir -p ./build/files/${MOD_NAME}_${TESTING_VERSION}
+printf "${LIGHTBLUE}Moving ${YELLOW}${MOD_NAME}${LIGHTBLUE} build files to versioned build directory${NC}\n"
+mv ./build/files/${MOD_NAME} ./build/files/${MOD_NAME}_${TESTING_VERSION}
 
-printf "${LIGHTBLUE}Copying Factorio Reactive Evolution Factor build files to build directory${NC}\n"
-for filename in *.lua info.json *.png README.md ${ADDITIONAL_FILES}  ; do
-  cp -r ./${filename} ./build/files/${MOD_NAME}_${TESTING_VERSION}/.
-done
 printf "${LIGHTBLUE}Updating Version to Test Version${NC}\n"
 sed -i "s/@@VERSION@@/${TESTING_VERSION}/g" ./build/files/${MOD_NAME}_${TESTING_VERSION}/info.json
