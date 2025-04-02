@@ -31,7 +31,7 @@ function on_entity_died(event)
     local event_json = {}
     event_json["name"] = event.name
     event_json["event"] = "DESTROYED"
-    if event.damage_type then
+    if event.damage_type ~= nil then
         event_json["damage_type"] = event.damage_type.name
     else
         event_json["damage_type"] = "no-damage"
@@ -43,7 +43,7 @@ function on_entity_died(event)
         event_json["entity"]["force"] = event.entity.force.name
         event_json["entity"]["position"] = event.entity.position
     end
-    if event.force then
+    if event.force ~= nil then
         event_json["force"] = {}
         event_json["force"]["name"] = event.force.name
     else
@@ -51,7 +51,7 @@ function on_entity_died(event)
         event_json["force"]["name"] = "none"
         event_json["force"]["reason"] = "ambient damage"
     end
-    if event.cause then
+    if event.cause ~= nil then
         event_json["cause"] = {}
         event_json["cause"]["reason"] = "Combat"
         event_json["cause"]["name"] =  (event.cause.name or "no-cause")
